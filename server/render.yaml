@@ -2,8 +2,10 @@ services:
   - type: web
     name: trading-bot-api
     env: node
+    region: frankfurt
     buildCommand: npm install
     startCommand: npm start
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: META_API_TOKEN
+        sync: false
+    autoDeploy: true
