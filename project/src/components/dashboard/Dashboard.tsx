@@ -3,6 +3,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import AIAnalysis from '../trading/AIAnalysis';
 import TradeHistory from '../trading/TradeHistory';
 import TradingStats from '../trading/TradingStats';
+import ActiveTrades from '../trading/ActiveTrades';
+import TradingChart from '../charts/TradingChart';
+import MarketAnalysis from '../trading/MarketAnalysis';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -41,6 +44,44 @@ const Dashboard: React.FC = () => {
     profitFactor: 2.1,
   };
 
+  const mockActiveTrades = [
+    {
+      id: '3',
+      symbol: 'EURUSD',
+      type: 'buy' as const,
+      openPrice: 1.12345,
+      currentPrice: 1.12400,
+      profit: 55.00,
+      volume: 0.1,
+      openTime: '2025-02-01T16:00:00Z',
+      stopLoss: 1.12245,
+      takeProfit: 1.12545,
+    },
+  ];
+
+  const mockChartData = Array.from({ length: 100 }, (_, i) => ({
+    timestamp: new Date(Date.now() - (100 - i) * 60000).toISOString(),
+    price: 1.12345 + Math.random() * 0.001,
+    ma20: 1.12355,
+    ma50: 1.12365,
+    volume: 100 + Math.random() * 50,
+  }));
+
+  const mockMarketSignals = [
+    {
+      symbol: 'EURUSD',
+      direction: 'buy' as const,
+      strength: 75,
+      timeframe: 'H1',
+      indicators: [
+        { name: 'RSI', value: '65', signal: 'buy' as const },
+        { name: 'MACD', value: 'Bullish', signal: 'buy' as const },
+        { name: 'MA Cross', value: 'Above', signal: 'buy' as const },
+      ],
+      lastUpdate: new Date().toISOString(),
+    },
+  ];
+
   if (!user?.metaTrader.account) {
     return (
       <div className="text-center">
@@ -50,6 +91,14 @@ const Dashboard: React.FC = () => {
   }
 
   const { balance, equity, profit } = user.metaTrader.account;
+
+  const handleCloseTrade = (tradeId: string) => {
+    console.log('Closing trade:', tradeId);
+  };
+
+  const handleModifyTrade = (tradeId: string, stopLoss: number, takeProfit: number) => {
+    console.log('Modifying trade:', tradeId, { stopLoss, takeProfit });
+  };
 
   return (
     <div className="space-y-8">
@@ -70,8 +119,26 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <TradingStats stats={mockStats} />
-      <AIAnalysis />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <TradingChart
+          data={mockChartData}
+          symbol="EURUSD"
+          timeframe="H1"
+        />
+        <MarketAnalysis signals={mockMarketSignals} />
+      </div>
+
+      <ActiveTrades
+        trades={mockActiveTrades}
+        onCloseTrade={handleCloseTrade}
+        onModifyTrade={handleModifyTrade}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <TradingStats stats={mockStats} />
+        <AIAnalysis />
+      </div>
+
       <TradeHistory trades={mockTrades} />
     </div>
   );
