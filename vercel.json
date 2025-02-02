@@ -11,12 +11,16 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "https://trading-bot-m9lh.onrender.com/api/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "project/dist/$1"
     }
   ],
   "env": {
-    "VITE_API_URL": "https://api.metatrader.com/v1",
-    "VITE_OPENAI_API_URL": "https://api.openai.com/v1"
+    "VITE_API_URL": "https://trading-bot-m9lh.onrender.com",
+    "VITE_META_API_TOKEN": "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI5NTI4NWFhYzg4YWI3MTkzNzAxMjdiN2U4YzU3YzhkNyIsInBlcm1pc3Npb25zIjpbXSwiYWNjZXNzUnVsZXMiOlt7ImlkIjoidHJhZGluZy1hY2NvdW50LW1hbmFnZW1lbnQtYXBpIiwibWV0aG9kcyI6WyJ0cmFkaW5nLWFjY291bnQtbWFuYWdlbWVudC1hcGk6cmVzdDpwdWJsaWM6KjoqIl0sInJvbGVzIjpbInJlYWRlciIsIndyaXRlciJdLCJyZXNvdXJjZXMiOlsiKjokVVNFUl9JRCQ6KiJdfV19.K3sw4rxSgd4EQSzfJ7cuZQ"
   }
 }

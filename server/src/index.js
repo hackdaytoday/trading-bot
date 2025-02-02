@@ -17,8 +17,14 @@ if (result.error) {
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Konfiguracja CORS
+app.use(cors({
+  origin: ['https://trading-bot-vercel.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Przechowuj połączenia klientów
