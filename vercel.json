@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd project && npm install && npm run build",
-  "outputDirectory": "project/dist",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "routes": [
     {
       "src": "/api/(.*)",

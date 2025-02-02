@@ -1,0 +1,483 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Dark mode styles */
+.dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Light mode styles */
+.light {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Add 3D Animation Keyframes */
+@keyframes rotate-3d {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 40px rgba(74, 222, 128, 0.6);
+  }
+}
+
+/* 3D Container */
+.rotating-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.rotating-box {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  transform-style: preserve-3d;
+  animation: rotate-3d 20s linear infinite;
+}
+
+.rotating-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(74, 222, 128, 0.2);
+  border-radius: 8px;
+  backface-visibility: hidden;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Keep existing styles */
+:root {
+  --dark-bg: #0a0b0e;
+  --card-bg: #12141a;
+  --card-hover: #1a1d23;
+  --neon-green: #4ade80;
+  --neon-gold: #f59e0b;
+  --neon-red: #ef4444;
+  --neon-glow: 0 0 10px rgba(74, 222, 128, 0.2),
+               0 0 20px rgba(74, 222, 128, 0.1);
+}
+
+/* Base styles */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: #e5e7eb;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+  overflow-x: hidden;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/* Enhanced Card styles with holographic effect */
+.card {
+  background: rgba(18, 20, 26, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(74, 222, 128, 0.1),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    rgba(74, 222, 128, 0.05) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(74, 222, 128, 0.4);
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.card:hover::before,
+.card:hover::after {
+  opacity: 1;
+}
+
+/* Holographic glass effect */
+.glass-effect {
+  background: rgba(18, 20, 26, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Enhanced neon effects */
+.neon-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    var(--neon-green),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.neon-border:hover::before {
+  opacity: 0.3;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.neon-text {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* Holographic text effect */
+.holographic-text {
+  background: linear-gradient(
+    90deg,
+    var(--neon-green) 0%,
+    #4ade80 25%,
+    #f59e0b 50%,
+    #4ade80 75%,
+    var(--neon-green) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: holographic-slide 3s linear infinite;
+}
+
+@keyframes holographic-slide {
+  to { background-position: 200% center; }
+}
+
+/* Neural network background */
+.neural-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.neural-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at center, rgba(74, 222, 128, 0.1) 0%, transparent 70%),
+    linear-gradient(0deg, var(--dark-bg) 0%, transparent 100%);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Glitch effect */
+.glitch-effect {
+  position: relative;
+}
+
+.glitch-effect::before,
+.glitch-effect::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip: rect(0, 0, 0, 0);
+}
+
+.glitch-effect::before {
+  left: 2px;
+  text-shadow: -1px 0 var(--neon-green);
+  animation: glitch-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-effect::after {
+  left: -2px;
+  text-shadow: 1px 0 var(--neon-red);
+  animation: glitch-2 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-1 {
+  0% { clip: rect(20px, 9999px, 15px, 0); }
+  100% { clip: rect(25px, 9999px, 99px, 0); }
+}
+
+@keyframes glitch-2 {
+  0% { clip: rect(15px, 9999px, 25px, 0); }
+  100% { clip: rect(10px, 9999px, 85px, 0); }
+}
+
+/* Cyber grid with enhanced animation */
+.cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(57, 255, 20, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(57, 255, 20, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-fade 2s ease-in-out infinite alternate;
+}
+
+@keyframes grid-fade {
+  from { opacity: 0.1; }
+  to { opacity: 0.3; }
+}
+
+/* 3D Transform Utilities */
+.transform-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.translate-z {
+  transform: translateZ(var(--z-depth, 20px));
+}
+
+/* Enhanced Animation Utilities */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1) translateZ(var(--z-depth, 0));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateZ(calc(var(--z-depth, 0) + 10px));
+  }
+}
+
+@keyframes rotate-3d {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) translateZ(var(--z-depth, 0));
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg) translateZ(var(--z-depth, 0));
+  }
+}
+
+/* Holographic card effect */
+.card-holographic {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-holographic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 0%,
+    rgba(74, 222, 128, 0.1) 25%,
+    rgba(74, 222, 128, 0.1) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: holographic-move 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-holographic:hover::before {
+  opacity: 1;
+}
+
+@keyframes holographic-move {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 200%; }
+}
+
+/* Interactive button styles */
+.btn-interactive {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-interactive::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    90deg,
+    var(--neon-green),
+    var(--neon-gold),
+    var(--neon-green)
+  );
+  background-size: 200% auto;
+  animation: btn-gradient 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.btn-interactive:hover::before {
+  opacity: 1;
+}
+
+@keyframes btn-gradient {
+  to { background-position: 200% center; }
+}
+
+/* Futuristic scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3139;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d424d;
+}
+
+/* Loading animations */
+.loading-pulse {
+  animation: loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* AI-powered animations */
+.ai-float {
+  animation: ai-float 3s ease-in-out infinite;
+}
+
+@keyframes ai-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Neural network connection lines */
+.neural-line {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+  height: 1px;
+  width: 100%;
+  opacity: 0.2;
+  animation: neural-pulse 2s ease-in-out infinite;
+}
+
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+/* Metaverse portal effect */
+.portal-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.portal-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--neon-green) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.portal-effect:hover::before {
+  opacity: 0.1;
+  animation: portal-pulse 2s ease-in-out infinite;
+}
+
+@keyframes portal-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
