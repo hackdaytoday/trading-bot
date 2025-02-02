@@ -1,22 +1,18 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "project/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "buildCommand": "cd project && npm install && npm run build",
+  "outputDirectory": "project/dist",
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "https://trading-bot-m9lh.onrender.com/api/$1"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "project/dist/$1"
+      "dest": "/index.html"
     }
   ],
   "env": {
