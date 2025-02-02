@@ -1,20 +1,33 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:10000',
-        changeOrigin: true,
-        secure: false
-      }
-    }
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
   },
   define: {
-    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
-    'process.env.VITE_META_API_TOKEN': JSON.stringify(process.env.VITE_META_API_TOKEN)
+    'process.env': process.env,
+    global: 'globalThis',
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      include: [/node_modules/],
+    },
+    rollupOptions: {
+      external: ['buffer', 'events', 'axios'],
+      output: {
+        globals: {
+          buffer: 'Buffer',
+          events: 'EventEmitter',
+          axios: 'axios'
+        }
+      }
+    }
   }
-});
+})

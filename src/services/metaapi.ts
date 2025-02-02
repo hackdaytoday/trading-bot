@@ -1,188 +1,53 @@
-import { Buffer } from 'buffer';
+// Usuwamy import Buffer i dodajemy polyfill
+const bufferPolyfill = {
+  from: (data: string) => new Uint8Array(Buffer.from(data)),
+  alloc: (size: number) => new Uint8Array(size),
+  allocUnsafe: (size: number) => new Uint8Array(size),
+  isBuffer: (obj: any) => obj instanceof Uint8Array
+};
 
-window.Buffer = Buffer;
+(window as any).Buffer = bufferPolyfill;
 
-export interface AccountInfo {
-  balance: number;
-  previousBalance: number;
-  equity: number;
-  previousEquity: number;
-  margin: number;
-  previousMargin: number;
-  freeMargin: number;
-  previousFreeMargin: number;
-  profit: number;
-  previousProfit: number;
-  leverage: number;
-  currency: string;
-  riskLevel: 'Low' | 'Moderate' | 'High';
-  stopLoss: number;
-  takeProfit: number;
-  maxDrawdown: number;
-  maxPositionSize: number;
-  balanceHistory: Array<{ timestamp: number; value: number }>;
-  equityHistory: Array<{ timestamp: number; value: number }>;
-  marginHistory: Array<{ timestamp: number; value: number }>;
-  freeMarginHistory: Array<{ timestamp: number; value: number }>;
-  profitHistory: Array<{ timestamp: number; value: number }>;
-  totalTrades: number;
-  successfulTrades: number;
-  failedTrades: number;
-  consecutiveWins: number;
-  consecutiveLosses: number;
-  totalProfit: number;
-  totalLoss: number;
-}
+import axios from 'axios';
+import { MetaTraderAccount } from '../types/metaTrader';
 
-interface Position {
-  id: string;
-  symbol: string;
-  type: string;
-  volume: number;
-  openPrice: number;
-  stopLoss?: number;
-  takeProfit?: number;
-  profit: number;
-}
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const META_API_TOKEN = import.meta.env.VITE_META_API_TOKEN;
 
-class MetaApiService {
-  private connectionId: string | null = null;
-  private apiUrl: string;
-
-  constructor() {
-    this.apiUrl = import.meta.env.VITE_API_URL;
-    if (!this.apiUrl) {
-      throw new Error('Brak adresu API');
-    }
+export const getAccountInfo = async (): Promise<MetaTraderAccount> => {
+  try {
+    const response = await axios.get(`${API_URL}/api/account`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to get account information');
   }
+};
 
-  public async connect(server: string, login: string, password: string): Promise<AccountInfo> {
+export const metaApiService = {
+  async connect(server: string, login: string, password: string): Promise<MetaTraderAccount> {
     try {
-      console.log('Próba połączenia z kontem MT5:', { server, login });
-
-      const response = await fetch(`${this.apiUrl}/connect`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          server: server.trim(), 
-          login: login.trim(), 
-          password: password 
-        }),
+      const response = await axios.post(`${API_URL}/api/connect`, {
+        server,
+        login,
+        password,
+        token: META_API_TOKEN
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Błąd odpowiedzi serwera:', error);
-        throw new Error(error.error || 'Nie udało się połączyć z kontem MT5');
-      }
-
-      const data = await response.json();
-      console.log('Otrzymano odpowiedź:', data);
-      
-      if (!data.connectionId) {
-        throw new Error('Brak identyfikatora połączenia w odpowiedzi');
-      }
-      
-      this.connectionId = data.connectionId;
-      return data.accountInfo;
+      return response.data;
     } catch (error: any) {
-      console.error('Błąd podczas łączenia z kontem MT5:', error);
-      throw new Error(error.message || 'Nie udało się połączyć z kontem MT5');
+      throw new Error(error.response?.data?.message || 'Failed to connect to MetaTrader');
     }
-  }
+  },
 
-  public async waitForConnection(timeout: number = 60000) {
-    const startTime = Date.now();
-    
-    while (Date.now() - startTime < timeout) {
-      if (this.connectionId) {
-        try {
-          // Spróbuj pobrać dane konta, aby upewnić się, że połączenie działa
-          await this.getAccountInfo();
-          return;
-        } catch (error) {
-          console.log('Oczekiwanie na aktywne połączenie...');
-        }
-      }
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    throw new Error('Nie udało się połączyć z kontem MT5 w wyznaczonym czasie');
-  }
-
-  private async ensureConnection(): Promise<void> {
-    if (!this.connectionId) {
-      throw new Error('Brak połączenia z kontem MT5');
-    }
-
+  async disconnect(): Promise<void> {
     try {
-      const response = await fetch(`${this.apiUrl}/connection/${this.connectionId}`);
-      if (!response.ok) {
-        this.connectionId = null;
-        throw new Error('Utracono połączenie z kontem MT5');
-      }
-    } catch (error) {
-      this.connectionId = null;
-      throw new Error('Utracono połączenie z kontem MT5');
+      await axios.post(`${API_URL}/api/disconnect`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to disconnect from MetaTrader');
     }
-  }
+  },
 
-  public async getAccountInfo(): Promise<AccountInfo> {
-    await this.ensureConnection();
+  getAccountInfo
+};
 
-    try {
-      const response = await fetch(`${this.apiUrl}/account/${this.connectionId}`);
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Nie udało się pobrać informacji o koncie');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Błąd podczas pobierania informacji o koncie MT5:', error);
-      throw error;
-    }
-  }
-
-  public async getPositions(): Promise<Position[]> {
-    await this.ensureConnection();
-
-    try {
-      const response = await fetch(`${this.apiUrl}/positions/${this.connectionId}`);
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Nie udało się pobrać pozycji');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Błąd podczas pobierania pozycji:', error);
-      throw error;
-    }
-  }
-
-  public async disconnect(): Promise<void> {
-    if (!this.connectionId) return;
-
-    try {
-      await fetch(`${this.apiUrl}/disconnect/${this.connectionId}`, {
-        method: 'POST'
-      });
-    } catch (error) {
-      console.error('Błąd podczas rozłączania:', error);
-    } finally {
-      this.connectionId = null;
-    }
-  }
-
-  public isConnected() {
-    return this.connectionId !== null;
-  }
-}
-
-export const metaApiService = new MetaApiService();
-export const getAccountInfo = () => metaApiService.getAccountInfo();
+export default metaApiService;
