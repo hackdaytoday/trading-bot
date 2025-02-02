@@ -1,136 +1,269 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Bell, Settings, Wifi, WifiOff, Menu, ChevronDown, Users, Wallet, DollarSign, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  FaChartLine,
-  FaCog,
-  FaHistory,
-  FaRobot,
-  FaSignOutAlt,
-  FaTachometerAlt,
-  FaFlask,
-} from 'react-icons/fa';
 
-const Navbar: React.FC = () => {
-  const { user, disconnect } = useAuth();
-  const location = useLocation();
+interface NavbarProps {
+  onMenuClick: () => void;
+}
 
-  const navigation = [
-    {
-      name: 'Dashboard',
-      href: '/app/dashboard',
-      icon: FaTachometerAlt,
-    },
-    {
-      name: 'Strategies',
-      href: '/app/strategies',
-      icon: FaRobot,
-    },
-    {
-      name: 'Testing',
-      href: '/app/testing',
-      icon: FaFlask,
-    },
-    {
-      name: 'Performance',
-      href: '/app/performance',
-      icon: FaChartLine,
-    },
-  ];
+export const Navbar = ({ onMenuClick }: NavbarProps) => {
+  const { user, disconnect, updateAccountInfo } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const isActive = (path: string) => location.pathname === path;
+  // Add real-time balance updates
+  useEffect(() => {
+    let updateInterval: NodeJS.Timer;
 
-  if (!user) {
-    return null;
-  }
+    const startUpdates = () => {
+      if (user?.metaTrader.connected && updateAccountInfo) {
+        // Initial update
+        updateAccountInfo().catch(console.error);
+
+        // Set up periodic updates
+        updateInterval = setInterval(() => {
+          updateAccountInfo().catch(console.error);
+        }, 1000);
+      }
+    };
+
+    startUpdates();
+
+    return () => {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+    };
+  }, [user?.metaTrader.connected, updateAccountInfo]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const formatCurrency = (value: number | undefined) => {
+    if (typeof value !== 'number') return '$0.00';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
 
   return (
-    <nav className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <img
-                className="h-8 w-auto"
-                src="/logo.png"
-                alt="Trading Bot"
-              />
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`${
-                    isActive(item.href)
-                      ? 'border-blue-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center">
-            <Link
-              to="/app/settings"
-              className={`${
-                isActive('/app/settings')
-                  ? 'text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
-              } p-2 rounded-md text-sm font-medium`}
-            >
-              <FaCog className="h-5 w-5" />
-            </Link>
+    <nav className="sticky top-0 bg-dark-card/95 backdrop-blur-md border-b border-gray-800 z-40">
+      <div className="px-3 xs:px-4 sm:px-5 lg:px-8 mx-auto">
+        <div className="flex items-center justify-between h-16">
+          {/* Left Section */}
+          <div className="flex items-center gap-3 xs:gap-4">
             <button
-              onClick={disconnect}
-              className="ml-4 p-2 text-gray-500 hover:text-gray-700 rounded-md text-sm font-medium"
+              onClick={onMenuClick}
+              className="p-2 -ml-2 text-gray-400 hover:text-gray-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-accent-green/20 rounded-lg active-state"
+              aria-label="Toggle menu"
             >
-              <FaSignOutAlt className="h-5 w-5" />
+              <Menu className="w-6 h-6" />
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div className="sm:hidden">
-        <div className="pt-2 pb-3 space-y-1">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`${
-                isActive(item.href)
-                  ? 'bg-blue-50 border-blue-500 text-blue-700'
-                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
-            >
-              <div className="flex items-center">
-                <item.icon className="mr-3 h-4 w-4" />
-                {item.name}
+            
+            <div className="flex items-center gap-2 xs:gap-3">
+              <div className="w-8 h-8 xs:w-9 xs:h-9 rounded-xl bg-gradient-to-br from-accent-green/20 to-accent-green/5 flex items-center justify-center shadow-glow">
+                <Wifi className="w-4 h-4 xs:w-5 xs:h-5 text-accent-green" />
               </div>
-            </Link>
-          ))}
-          <Link
-            to="/app/settings"
-            className={`${
-              isActive('/app/settings')
-                ? 'bg-blue-50 border-blue-500 text-blue-700'
-                : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
-          >
-            <div className="flex items-center">
-              <FaCog className="mr-3 h-4 w-4" />
-              Settings
+              <div>
+                <h1 className="text-base xs:text-lg sm:text-xl font-bold text-gray-100">STH BOT</h1>
+                <p className="text-2xs text-gray-500 hidden xs:block">AI Trading Platform</p>
+              </div>
             </div>
-          </Link>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-4">
+            {/* Account Stats - Desktop */}
+            {user?.metaTrader.connected && user?.metaTrader.account && (
+              <div className="hidden md:grid grid-cols-4 gap-2">
+                {/* Balance */}
+                <div className="px-4 py-2 rounded-lg bg-dark-card border border-gray-800/50 shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Wallet className="w-4 h-4 text-accent-green" />
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent-green rounded-full animate-pulse" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400">Balance</span>
+                      <span className="text-sm font-medium text-accent-green">
+                        {formatCurrency(user.metaTrader.account.balance)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Equity */}
+                <div className="px-4 py-2 rounded-lg bg-dark-card border border-gray-800/50 shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <DollarSign className="w-4 h-4 text-accent-gold" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400">Equity</span>
+                      <span className="text-sm font-medium text-accent-gold">
+                        {formatCurrency(user.metaTrader.account.equity)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Free Margin */}
+                <div className="px-4 py-2 rounded-lg bg-dark-card border border-gray-800/50 shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <TrendingUp className="w-4 h-4 text-accent-green" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400">Free Margin</span>
+                      <span className="text-sm font-medium text-accent-green">
+                        {formatCurrency(user.metaTrader.account.freeMargin)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* P/L */}
+                <div className="px-4 py-2 rounded-lg bg-dark-card border border-gray-800/50 shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <TrendingUp className={`w-4 h-4 ${user.metaTrader.account.profit >= 0 ? 'text-accent-green' : 'text-accent-red'}`} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400">P/L</span>
+                      <span className={`text-sm font-medium ${user.metaTrader.account.profit >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
+                        {formatCurrency(user.metaTrader.account.profit)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Connection Status */}
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-card border border-gray-800/50 shadow-soft">
+              {user?.metaTrader.connected ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Wifi className="w-4 h-4 text-accent-green" />
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent-green rounded-full animate-pulse" />
+                    </div>
+                    <span className="text-gray-100 text-sm">
+                      Connected to <span className="text-accent-green font-medium">{user.metaTrader.server}</span>
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-4 h-4 text-accent-red" />
+                  <span className="text-gray-400 text-sm">Disconnected</span>
+                </>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-0.5 xs:gap-1">
+              <button 
+                className="relative p-2 text-gray-400 hover:text-gray-200 transition-colors rounded-lg hover:bg-dark active-state"
+                aria-label="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-accent-gold rounded-full" />
+              </button>
+
+              <button 
+                className="p-2 text-gray-400 hover:text-gray-200 transition-colors rounded-lg hover:bg-dark active-state"
+                aria-label="Settings"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* User Menu */}
+            <div className="relative pl-2 xs:pl-3 border-l border-gray-800" ref={menuRef}>
+              <div className="flex items-center gap-2 xs:gap-3">
+                <div className="hidden sm:block text-right">
+                  <p className="text-sm font-medium text-gray-100">{user?.metaTrader.login}</p>
+                  <p className="text-2xs text-gray-500">Trading Account</p>
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="px-3 xs:px-4 py-2 text-sm font-medium text-gray-200 bg-dark hover:bg-dark-hover rounded-lg transition-all border border-gray-800 hover:border-gray-700 hover:shadow-lg active-state group whitespace-nowrap"
+                    aria-expanded={showUserMenu}
+                    aria-haspopup="true"
+                  >
+                    <span className="hidden xs:inline">Account</span>
+                    <span className="xs:hidden">Menu</span>
+                    <ChevronDown className={`w-4 h-4 ml-1.5 xs:ml-2 inline-block transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 py-2 bg-dark-card rounded-lg shadow-elevated border border-gray-800">
+                      <div className="px-4 py-2 border-b border-gray-800 sm:hidden">
+                        <p className="text-sm font-medium text-gray-100">{user?.metaTrader.login}</p>
+                        <p className="text-2xs text-gray-500">Trading Account</p>
+                      </div>
+                      {/* Mobile Account Stats */}
+                      {user?.metaTrader.connected && user?.metaTrader.account && (
+                        <div className="px-4 py-2 border-b border-gray-800 md:hidden">
+                          <div className="space-y-2">
+                            <div>
+                              <p className="text-xs text-gray-400">Balance</p>
+                              <p className="text-sm font-medium text-accent-green">
+                                {formatCurrency(user.metaTrader.account.balance)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Equity</p>
+                              <p className="text-sm font-medium text-accent-gold">
+                                {formatCurrency(user.metaTrader.account.equity)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Free Margin</p>
+                              <p className="text-sm font-medium text-accent-green">
+                                {formatCurrency(user.metaTrader.account.freeMargin)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">P/L</p>
+                              <p className={`text-sm font-medium ${user.metaTrader.account.profit >= 0 ? 'text-accent-green' : 'text-accent-red'}`}>
+                                {formatCurrency(user.metaTrader.account.profit)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          disconnect();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-gray-200 hover:bg-dark-hover transition-colors"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
   );
 };
-
-export default Navbar;

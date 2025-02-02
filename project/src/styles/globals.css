@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #111827;
+  --card-background: #1F2937;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --accent-green: #10B981;
+  --accent-red: #EF4444;
+  --accent-yellow: #F59E0B;
+  --border-color: #374151;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+.bg-dark-card {
+  background-color: var(--card-background);
+}
+
+.text-accent-green {
+  color: var(--accent-green);
+}
+
+.text-accent-red {
+  color: var(--accent-red);
+}
+
+.text-accent-yellow {
+  color: var(--accent-yellow);
+}
+
+.border-gray-800 {
+  border-color: var(--border-color);
+}
+
+/* Card Effects */
+.card {
+  position: relative;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    145deg,
+    rgba(31, 41, 55, 0.9),
+    rgba(31, 41, 55, 0.7)
+  );
+  backdrop-filter: blur(10px);
+}
+
+.card-3d {
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
+}
+
+.neon-border {
+  position: relative;
+  border: 1px solid rgba(74, 222, 128, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 0 0 1px rgba(74, 222, 128, 0.1);
+  isolation: isolate;
+}
+
+.neon-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0.5rem;
+  padding: 2px;
+  background: linear-gradient(
+    45deg,
+    rgba(74, 222, 128, 0.1),
+    rgba(74, 222, 128, 0.2),
+    rgba(74, 222, 128, 0.1)
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+}
+
+.neon-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.5rem;
+  padding: 1px;
+  background: linear-gradient(
+    45deg,
+    rgba(74, 222, 128, 0.1),
+    rgba(74, 222, 128, 0.2),
+    rgba(74, 222, 128, 0.1)
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: blur(8px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.neon-border:hover::after {
+  opacity: 1;
+}
+
+/* Animation for neon effect */
+@keyframes neonPulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.neon-border::before {
+  animation: neonPulse 3s ease-in-out infinite;
+}
+
+/* Custom scrollbar for cards */
+.card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.5);
+  border-radius: 4px;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background: rgba(74, 222, 128, 0.2);
+  border-radius: 4px;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 222, 128, 0.3);
+}
