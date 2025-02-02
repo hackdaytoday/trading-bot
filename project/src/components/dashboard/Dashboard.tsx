@@ -1,9 +1,45 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import AIAnalysis from '../trading/AIAnalysis';
+import TradeHistory from '../trading/TradeHistory';
+import TradingStats from '../trading/TradingStats';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+
+  // Mock data for demonstration
+  const mockTrades = [
+    {
+      id: '1',
+      symbol: 'EURUSD',
+      type: 'buy' as const,
+      openPrice: 1.12345,
+      closePrice: 1.12456,
+      profit: 111.00,
+      openTime: '2025-02-01T10:00:00Z',
+      closeTime: '2025-02-01T14:30:00Z',
+    },
+    {
+      id: '2',
+      symbol: 'GBPUSD',
+      type: 'sell' as const,
+      openPrice: 1.35678,
+      closePrice: 1.35567,
+      profit: -89.00,
+      openTime: '2025-02-01T11:15:00Z',
+      closeTime: '2025-02-01T15:45:00Z',
+    },
+  ];
+
+  const mockStats = {
+    totalTrades: 50,
+    winningTrades: 30,
+    losingTrades: 20,
+    winRate: 0.6,
+    averageWin: 150.25,
+    averageLoss: -75.50,
+    profitFactor: 2.1,
+  };
 
   if (!user?.metaTrader.account) {
     return (
@@ -34,7 +70,9 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      <TradingStats stats={mockStats} />
       <AIAnalysis />
+      <TradeHistory trades={mockTrades} />
     </div>
   );
 };
