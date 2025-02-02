@@ -8,6 +8,7 @@ import {
   FaRobot,
   FaSignOutAlt,
   FaTachometerAlt,
+  FaFlask,
 } from 'react-icons/fa';
 
 const Navbar: React.FC = () => {
@@ -24,6 +25,11 @@ const Navbar: React.FC = () => {
       name: 'Strategies',
       href: '/app/strategies',
       icon: FaRobot,
+    },
+    {
+      name: 'Testing',
+      href: '/app/testing',
+      icon: FaFlask,
     },
     {
       name: 'Performance',

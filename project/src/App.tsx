@@ -11,6 +11,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import Strategies from './pages/Strategies';
 import Performance from './pages/Performance';
 import Settings from './pages/Settings';
+import Testing from './pages/Testing';
 
 // Layout
 import Layout from './components/layout/Layout';
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Route path="strategies" element={<Strategies />} />
             <Route path="performance" element={<Performance />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="testing" element={<Testing />} />
           </Route>
         </Routes>
       </AuthProvider>
