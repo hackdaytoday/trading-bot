@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "project/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "project/dist/$1"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://api.metatrader.com/v1",
+    "VITE_OPENAI_API_URL": "https://api.openai.com/v1"
+  }
+}
